@@ -3,26 +3,31 @@ import click
 
 @click.command()
 @click.option('--epochs', default=5, help='number of epochs to train neural network.')
-def main(epochs):
-    click.echo(f'Training neural net with {epochs} epochs')
-    x = train_feedforward(epochs)
-    x.train()
+@click.option('--arch', default='ff', help='neural network architecture to benchmark.')
+def main(epochs, arch):
+    if arch == 'ff':
+        click.echo(f'Training neural {arch}-net with {epochs} epochs')
+        feedforward_model = FeedforwardNet().to(device)
+        init_net(epochs, feedforward_model).train()
+
+    elif arch == 'conv':
+        click.echo(f'Training neural {arch}-net with {epochs} epochs')
+        conv_model = ConvNet().to(device)
+        init_net(epochs, conv_model).train()
 
 if __name__ == "__main__":
     main()
 
 '''
-Make arguments for CLI
-- type of DNN to train
-
-Add Options
+TODO:
+Options
 - batch size
 - where to log results
 
-Flags (enable/disable certain behavior)
--GPU/No GPU
+Flags
+- GPU or CPU
+- Number Workers
 
-use figlet for cmd font
-use click
-
+App screen
+- use figlet for cmd font
 '''
