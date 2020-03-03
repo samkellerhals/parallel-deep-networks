@@ -1,4 +1,6 @@
 from data import *
+import os
+import click
 
 # Feedforward neural network
 class FeedforwardNet(nn.Module):
@@ -70,6 +72,7 @@ class init_net():
     def train(self):
         for epoch in range(self.num_epochs):
             self.model.train()
+            pid = os.getpid()
             
             for batch_idx, (data, target) in enumerate(train_data):
                 data, target = data.to(device), target.to(device)
@@ -84,7 +87,7 @@ class init_net():
                 loss.backward()
                 self.optimiser.step()
 
-            print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(epoch, batch_idx * len(data), len(train_data.dataset), 100. * batch_idx / len(train_data), loss.item()))
+                print('PID: {} Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(pid, epoch, batch_idx * len(data), len(train_data.dataset), 100. * batch_idx / len(train_data), loss.item()))
 
     #TODO: write better testing function here.
     def test(self):
