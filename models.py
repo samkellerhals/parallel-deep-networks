@@ -1,6 +1,12 @@
-from data import *
+import torch
+import torchvision
+from torchvision import datasets, transforms
+import torch.nn as nn
+import torch.nn.functional as F
+import torch.optim as optim
+import matplotlib.pyplot as plt
 import os
-import click
+import time
 
 # Feedforward neural network
 class FeedforwardNet(nn.Module):
@@ -63,49 +69,64 @@ class ConvNet(nn.Module):
         return probs
 
 # Train and test models
-class init_net():
-    def __init__(self, num_epochs, model):
-        self.num_epochs = num_epochs
-        self.model = model.to(device)
-        self.optimiser = optim.SGD(self.model.parameters(), lr=0.001)
+def train(epochs, arch, model, device, train_loader):
+    #train_data = get_train_data()
+    optimiser = optim.SGD(model.parameters(), lr=0.001)
     
-    def train(self):
-        for epoch in range(self.num_epochs):
-            self.model.train()
-            pid = os.getpid()
+    total_time = 0
+
+    for epoch in range(1, epochs + 1):
+        start_time = time.time()
+        model.train()
+        pid = os.getpid()
+        
+        for batch_idx, (data, target) in enumerate(train_loader):
+            data, target = data.to(device), target.to(device)
+            optimiser.zero_grad()
             
-            for batch_idx, (data, target) in enumerate(train_data):
-                data, target = data.to(device), target.to(device)
-                self.optimiser.zero_grad()
-                
-                if self.model.model_type == "conv":
-                    output = self.model(data)
-                else:
-                    output = self.model(data.view(-1, 28*28))
+            if arch == "conv":
+                output = model(data)
+            else:
+                output = model(data.view(-1, 28*28))
 
-                loss = F.nll_loss(output, target)
-                loss.backward()
-                self.optimiser.step()
+            loss = F.nll_loss(output, target)
+            
+            loss.backward()
+            
+            optimiser.step()
 
-                print('PID: {} Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(pid, epoch, batch_idx * len(data), len(train_data.dataset), 100. * batch_idx / len(train_data), loss.item()))
+            #print('PID: {} Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(pid, epoch, batch_idx * len(data), len(train_loader.dataset), 100. * batch_idx / len(train_loader), loss.item()))
+        
+        end_time = time.time()
+        
+        processing_time = end_time - start_time
+        
+        total_time += processing_time
 
-    #TODO: write better testing function here.
-    def test(self):
-        correct = 0
-        total = 0
+    print(f'Total time taken from model training: {total_time}')
 
-        with torch.no_grad():
-            for data in test_data:
-                X, y = data
-                X, y = X.to(device), y.to(device)
-                output = self.model(X.view(-1,784))
-                
-                for idx, i in enumerate(output):
-                    if torch.argmax(i) == y[idx]:
-                        correct += 1
-                    total += 1
-                
-            print("Accuracy: ", round(correct/total, 3))
+def test(model, device, test_loader, arch):
+    model.eval()
+    test_loss = 0
+    correct = 0
+    with torch.no_grad():
+        for data, target in test_loader:
+            data, target = data.to(device), target.to(device)
+            
+            if arch == "conv":
+                output = model(data)
+            else:
+                output = model(data.view(-1, 28*28))
+
+            test_loss += F.nll_loss(output, target, reduction='sum').item()  # sum up batch loss
+            pred = output.argmax(dim=1, keepdim=True)  # get the index of the max log-probability
+            correct += pred.eq(target.view_as(pred)).sum().item()
+
+    test_loss /= len(test_loader.dataset)
+
+    print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
+        test_loss, correct, len(test_loader.dataset),
+        100. * correct / len(test_loader.dataset)))
 
 
 if __name__ == "__main__":
