@@ -7,6 +7,8 @@ import torch.optim as optim
 import matplotlib.pyplot as plt
 import os
 import time
+import json
+from utils import find_latest_log
 
 # Feedforward neural network
 class FeedforwardNet(nn.Module):
@@ -94,8 +96,6 @@ def train(epochs, arch, model, device, train_loader):
             loss.backward()
             
             optimiser.step()
-
-            #print('PID: {} Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(pid, epoch, batch_idx * len(data), len(train_loader.dataset), 100. * batch_idx / len(train_loader), loss.item()))
         
         end_time = time.time()
         
@@ -103,7 +103,20 @@ def train(epochs, arch, model, device, train_loader):
         
         total_time += processing_time
 
-    print(f'Total time taken from model training: {total_time}')
+    # Write file with training metrics
+
+        latest_log = find_latest_log()
+
+    with open(latest_log) as f:
+        data = json.load(f)
+        data['training_time'] = total_time
+        new_data = json.dumps(data)
+    
+    with open(latest_log,'w') as f:
+        f.write(new_data)
+        f.close()
+
+    print(f'Model metrics have been saved at: {latest_log}')
 
 def test(model, device, test_loader, arch):
     model.eval()
@@ -123,6 +136,20 @@ def test(model, device, test_loader, arch):
             correct += pred.eq(target.view_as(pred)).sum().item()
 
     test_loss /= len(test_loader.dataset)
+
+     # Write file with training metrics
+
+    latest_log = find_latest_log()
+
+    with open(latest_log) as f:
+        data = json.load(f)
+        data['accuracy'] = 100. * correct / len(test_loader.dataset)
+        data['avg_loss'] = test_loss
+        new_data = json.dumps(data)
+    
+    with open(latest_log,'w') as f:
+        f.write(new_data)
+        f.close()
 
     print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
         test_loss, correct, len(test_loader.dataset),

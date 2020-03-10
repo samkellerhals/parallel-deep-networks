@@ -3,6 +3,8 @@ import torch.multiprocessing as mp
 from torch.utils.data import DataLoader, DistributedSampler
 import pyfiglet
 import click
+from datetime import datetime
+import json
 
 trainset = datasets.QMNIST("", train=True, download=True, transform=(transforms.Compose([transforms.ToTensor()])))
 
@@ -52,11 +54,12 @@ def hogwild(model_class, procs, epochs, arch, distributed, nodes):
 
 def ff_train(arch, epochs, procs, distributed, nodes):
     click.echo(f'Training neural {arch}-net with {epochs} epochs using {procs} processes with distributed processing == {distributed} and {nodes} CPU cores.')
+    
     model_class = FeedforwardNet()
     hogwild(model_class, procs, epochs, arch, distributed, nodes)
 
 def conv_train(arch, epochs, procs, distributed, nodes):    
-    click.echo(f'Training neural {arch}-net with {epochs} epochs using {procs} processes')
+    click.echo(f'Training neural {arch}-net with {epochs} epochs using {procs} processes with distributed processing == {distributed} and {nodes} CPU cores.')      
     model_class = ConvNet()
     hogwild(model_class, procs, epochs, arch, distributed, nodes)
 
@@ -71,8 +74,26 @@ def conv_train(arch, epochs, procs, distributed, nodes):
 def main(epochs, arch, procs, distributed, nodes):
     
     intro_text = pyfiglet.figlet_format('Parallel DNN Benchmark', font='slant')
+    
     print(intro_text)
-            
+    
+    date_time = datetime.now().strftime("%d%m%Y%H%M%S")
+
+    with open('log/' + date_time + '.json', 'w') as f:
+        params = {'Architecture':arch, 
+        'num_epochs':epochs, 
+        'num_processes':procs, 
+        'threads':nodes, 
+        'is_distributed':distributed, 
+        'training_time': 'null', 
+        'accuracy': 'null',
+        'avg_loss': 'null'
+        }
+
+        data = json.dumps(params)
+        f.write(data)
+        f.close()
+
     if click.confirm('Do you want to start the benchmark now?'):
         if arch == 'ff':            
             ff_train(arch, epochs, procs, distributed, nodes)
@@ -81,6 +102,7 @@ def main(epochs, arch, procs, distributed, nodes):
             conv_train(arch, epochs, procs, distributed, nodes)
 
     end_text = pyfiglet.figlet_format('Finished benchmark', font='slant')
+    
     print(end_text)
     
 if __name__ == "__main__":
@@ -91,11 +113,4 @@ TODO:
 Options
 - batch size
 - where to log results
-
-Flags
-- GPU or CPU
-- Number Workers
-
-App screen
-- use figlet for cmd font
 '''
