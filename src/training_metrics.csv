@@ -1,0 +1,4 @@
+,architecture,num_epochs,num_processes,threads,is_distributed,training_time,accuracy,avg_loss
+0,ff,2,1,2,n,null,null,null
+1,ff,2,1,1,n,12.382465600967407,48.196666666666665,1.8467648974736532
+2,ff,2,1,1,n,12.329585075378418,45.115,1.936911531416575

@@ -67,9 +67,8 @@ def conv_train(arch, epochs, procs, distributed, nodes):
 @click.option('--epochs', default=1, help='number of epochs to train neural network.')
 @click.option('--arch', default='ff', help='neural network architecture to benchmark.')
 @click.option('--distributed', default='n', help='whether to distribute data or not.')
-@click.option('--procs', default=2, help='number of processes to spawn.')
+@click.option('--procs', default=1, help='number of processes to spawn.')
 @click.option('--nodes', default=1, help='number of cores to use.')
-#@click.option('--', default=2, help='number of cores to use.')
 #@click.option('--batches', default=12, help='minibatch size to use.')
 def main(epochs, arch, procs, distributed, nodes):
     
@@ -79,8 +78,8 @@ def main(epochs, arch, procs, distributed, nodes):
     
     date_time = datetime.now().strftime("%d%m%Y%H%M%S")
 
-    with open('log/' + date_time + '.json', 'w') as f:
-        params = {'Architecture':arch, 
+    with open('src/log/' + date_time + '.json', 'w') as f:
+        params = {'architecture':arch, 
         'num_epochs':epochs, 
         'num_processes':procs, 
         'threads':nodes, 
@@ -94,12 +93,12 @@ def main(epochs, arch, procs, distributed, nodes):
         f.write(data)
         f.close()
 
-    if click.confirm('Do you want to start the benchmark now?'):
-        if arch == 'ff':            
-            ff_train(arch, epochs, procs, distributed, nodes)
-        
-        elif arch == 'conv':
-            conv_train(arch, epochs, procs, distributed, nodes)
+    
+    if arch == 'ff':            
+        ff_train(arch, epochs, procs, distributed, nodes)
+    
+    elif arch == 'conv':
+        conv_train(arch, epochs, procs, distributed, nodes)
 
     end_text = pyfiglet.figlet_format('Finished benchmark', font='slant')
     
@@ -107,10 +106,3 @@ def main(epochs, arch, procs, distributed, nodes):
     
 if __name__ == "__main__":
     main()
-
-'''
-TODO:
-Options
-- batch size
-- where to log results
-'''
