@@ -1,0 +1,1 @@
+{"architecture": "ff", "num_epochs": 2, "num_processes": 2, "threads": 8, "is_distributed": "y", "training_time": 32.839207887649536, "accuracy": 33.55, "avg_loss": 2.2235910007794697}
