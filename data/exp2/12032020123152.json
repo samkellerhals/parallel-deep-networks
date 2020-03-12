@@ -1,0 +1,1 @@
+{"architecture": "conv", "num_epochs": 2, "num_processes": 3, "threads": 12, "is_distributed": "y", "training_time": 93.10537552833557, "accuracy": 89.74833333333333, "avg_loss": 0.34025321885148685, "batch_size": 12}
