@@ -12,7 +12,7 @@ testset = datasets.QMNIST("", train=False, download=True, transform=(transforms.
 
 test_loader = torch.utils.data.DataLoader(dataset=testset, batch_size=12, shuffle=True)
 
-def hogwild(model_class, procs, epochs, arch, distributed, nodes):
+def hogwild(model_class, procs, epochs, arch, distributed, nodes, batches):
 
     torch.set_num_threads(nodes)
 
@@ -30,7 +30,7 @@ def hogwild(model_class, procs, epochs, arch, distributed, nodes):
 
             model.share_memory() 
 
-            train_loader = torch.utils.data.DataLoader(dataset=trainset, batch_size=12, sampler=DistributedSampler(dataset=trainset,num_replicas=procs,rank=rank))
+            train_loader = torch.utils.data.DataLoader(dataset=trainset, batch_size=batches, sampler=DistributedSampler(dataset=trainset,num_replicas=procs,rank=rank))
 
             p = mp.Process(target=train, args=(epochs, arch, model, device, train_loader))
 
@@ -45,23 +45,23 @@ def hogwild(model_class, procs, epochs, arch, distributed, nodes):
 
     else:
         
-        train_loader = torch.utils.data.DataLoader(dataset=trainset, batch_size=12, shuffle=True)
+        train_loader = torch.utils.data.DataLoader(dataset=trainset, batch_size=batches, shuffle=True)
 
         train(epochs, arch, model, device, train_loader)
 
         test(model, device, test_loader, arch)
 
 
-def ff_train(arch, epochs, procs, distributed, nodes):
-    click.echo(f'Training neural {arch}-net with {epochs} epochs using {procs} processes with distributed processing == {distributed} and {nodes} CPU cores.')
+def ff_train(arch, epochs, procs, distributed, nodes, batches):
+    click.echo(f'Training neural {arch}-net with {epochs} epochs using {procs} processes with distributed processing == {distributed}, {nodes} CPU cores and a batch size of {batches}.')
     
     model_class = FeedforwardNet()
-    hogwild(model_class, procs, epochs, arch, distributed, nodes)
+    hogwild(model_class, procs, epochs, arch, distributed, nodes, batches)
 
-def conv_train(arch, epochs, procs, distributed, nodes):    
-    click.echo(f'Training neural {arch}-net with {epochs} epochs using {procs} processes with distributed processing == {distributed} and {nodes} CPU cores.')      
+def conv_train(arch, epochs, procs, distributed, nodes, batches):    
+    click.echo(f'Training neural {arch}-net with {epochs} epochs using {procs} processes with distributed processing == {distributed}, {nodes} CPU cores and a batch size of {batches}.')      
     model_class = ConvNet()
-    hogwild(model_class, procs, epochs, arch, distributed, nodes)
+    hogwild(model_class, procs, epochs, arch, distributed, nodes, batches)
 
 @click.command()
 @click.option('--epochs', default=1, help='number of epochs to train neural network.')
@@ -69,12 +69,14 @@ def conv_train(arch, epochs, procs, distributed, nodes):
 @click.option('--distributed', default='n', help='whether to distribute data or not.')
 @click.option('--procs', default=1, help='number of processes to spawn.')
 @click.option('--nodes', default=1, help='number of cores to use.')
-#@click.option('--batches', default=12, help='minibatch size to use.')
-def main(epochs, arch, procs, distributed, nodes):
+@click.option('--batches', default=12, help='minibatch size to use.')
+def main(epochs, arch, procs, distributed, nodes, batches):
     
     intro_text = pyfiglet.figlet_format('Parallel DNN Benchmark', font='slant')
     
     print(intro_text)
+
+    
     
     date_time = datetime.now().strftime("%d%m%Y%H%M%S")
 
@@ -86,7 +88,8 @@ def main(epochs, arch, procs, distributed, nodes):
         'is_distributed':distributed, 
         'training_time': 'null', 
         'accuracy': 'null',
-        'avg_loss': 'null'
+        'avg_loss': 'null',
+        'batch_size': batches
         }
 
         data = json.dumps(params)
@@ -95,10 +98,10 @@ def main(epochs, arch, procs, distributed, nodes):
 
     
     if arch == 'ff':            
-        ff_train(arch, epochs, procs, distributed, nodes)
+        ff_train(arch, epochs, procs, distributed, nodes, batches)
     
     elif arch == 'conv':
-        conv_train(arch, epochs, procs, distributed, nodes)
+        conv_train(arch, epochs, procs, distributed, nodes, batches)
 
     end_text = pyfiglet.figlet_format('Finished benchmark', font='slant')
     

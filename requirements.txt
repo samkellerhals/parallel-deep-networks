@@ -5,3 +5,4 @@ pyfiglet
 click
 datetime
 matplotlib
+seaborn
