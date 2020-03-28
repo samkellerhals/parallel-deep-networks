@@ -1,0 +1,70 @@
+\begin{tabular}{lrrrr}
+\toprule
+{} & \multicolumn{4}{l}{training\_time} \\
+{} &          mean &        std &        min &         max \\
+num\_processes &               &            &            &             \\
+\midrule
+1             &     75.170646 &  47.086473 &  20.393749 &  169.995963 \\
+2             &     33.238958 &  28.232054 &  10.814672 &  151.888009 \\
+3             &     34.062515 &  37.363786 &   9.539017 &  182.749748 \\
+4             &     41.246646 &  52.631009 &   8.350045 &  314.137526 \\
+\bottomrule
+\end{tabular}
+\begin{tabular}{lrrrr}
+\toprule
+{} & \multicolumn{4}{l}{training\_time} \\
+{} &          mean &        std &        min &         max \\
+architecture &               &            &            &             \\
+\midrule
+conv         &     41.014937 &  45.165377 &   8.350045 &  314.137526 \\
+ff           &     37.437232 &  15.101410 &  10.814672 &   63.481202 \\
+\bottomrule
+\end{tabular}
+\begin{tabular}{lrrrr}
+\toprule
+{} & \multicolumn{4}{l}{training\_time} \\
+{} &          mean &        std &        min &         max \\
+batch\_size &               &            &            &             \\
+\midrule
+12         &     76.331048 &  54.482039 &  10.814672 &  314.137526 \\
+32         &     38.768016 &  23.179350 &  11.003628 &  108.404766 \\
+64         &     22.016107 &  10.529613 &   9.281776 &   54.919288 \\
+128        &     15.766811 &   5.352198 &   8.619527 &   33.631422 \\
+256        &     12.842346 &   3.724125 &   8.350045 &   25.086822 \\
+\bottomrule
+\end{tabular}
+\begin{tabular}{lrrrr}
+\toprule
+{} & \multicolumn{4}{l}{accuracy} \\
+{} &       mean &        std &        min &        max \\
+num\_processes &            &            &            &            \\
+\midrule
+1             &  68.357474 &  23.032844 &  26.770000 &  92.185000 \\
+2             &  58.981019 &  24.651158 &  10.881667 &  91.668333 \\
+3             &  60.745567 &  26.136508 &  11.323333 &  91.996667 \\
+4             &  61.267278 &  26.449213 &   9.831667 &  91.813333 \\
+\bottomrule
+\end{tabular}
+\begin{tabular}{lrrrr}
+\toprule
+{} & \multicolumn{4}{l}{accuracy} \\
+{} &       mean &        std &        min &        max \\
+architecture &            &            &            &            \\
+\midrule
+conv         &  63.036151 &  26.378135 &   9.831667 &  92.185000 \\
+ff           &  46.934892 &   7.562003 &  26.770000 &  62.601667 \\
+\bottomrule
+\end{tabular}
+\begin{tabular}{lrrrr}
+\toprule
+{} & \multicolumn{4}{l}{accuracy} \\
+{} &       mean &        std &        min &        max \\
+batch\_size &            &            &            &            \\
+\midrule
+12         &  75.843025 &  21.126715 &  26.770000 &  92.185000 \\
+32         &  83.060574 &   6.181306 &  44.858333 &  87.390000 \\
+64         &  66.315889 &   8.584150 &  42.696667 &  79.856667 \\
+128        &  41.922019 &  10.262596 &  12.320000 &  59.935000 \\
+256        &  23.571204 &   8.003690 &   9.831667 &  43.685000 \\
+\bottomrule
+\end{tabular}
