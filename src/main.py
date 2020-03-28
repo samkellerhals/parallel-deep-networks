@@ -65,8 +65,8 @@ def conv_train(arch, epochs, procs, distributed, nodes, batches):
 
 @click.command()
 @click.option('--epochs', default=1, help='number of epochs to train neural network.')
-@click.option('--arch', default='ff', help='neural network architecture to benchmark.')
-@click.option('--distributed', default='n', help='whether to distribute data or not.')
+@click.option('--arch', default='ff', help='neural network architecture to benchmark (conv or ff).')
+@click.option('--distributed', default='n', help='whether to distribute data or not (y or n).')
 @click.option('--procs', default=1, help='number of processes to spawn.')
 @click.option('--nodes', default=1, help='number of cores to use.')
 @click.option('--batches', default=12, help='minibatch size to use.')
